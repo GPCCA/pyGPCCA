@@ -250,8 +250,8 @@ def _eigs_slepc(P: spmatrix, k: int, which: "str" = "LR", tol: float = EPS) -> T
     if nconv < k:
         raise ValueError(f"Requested `{k}` eigenvalues/vectors, but only `{nconv}` converged.")
 
-    xr, _ = M.getVecs()
-    xi, _ = M.getVecs()
+    xr, _ = M.createVecs()
+    xi, _ = M.createVecs()
 
     eigenvalues, eigenvectors = [], []
     for i in range(k):
