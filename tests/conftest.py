@@ -107,7 +107,7 @@ def _skip_if_no_petsc_slepc() -> bool:
 skip_if_no_petsc_slepc = pytest.mark.skipif(_skip_if_no_petsc_slepc(), reason="No PETSc or SLEPc is installed.")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def count_sd():
     return np.array(
         [
@@ -158,7 +158,7 @@ def count_sd():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def count_A():
     return np.array(
         [
@@ -170,7 +170,7 @@ def count_A():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def count_A_sparse():
     return np.array(
         [
@@ -182,7 +182,7 @@ def count_A_sparse():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def count_chi():
     return np.array(
         [
@@ -397,7 +397,7 @@ def count_chi():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def count_chi_sparse():
     return np.array(
         [
@@ -448,7 +448,7 @@ def count_chi_sparse():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def count_sd_weights():
     return np.array(
         [2.8405568184913244e-01, 2.8755576853720533e-01, 4.2838854961366213e-01],
@@ -456,7 +456,7 @@ def count_sd_weights():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def count_Pc():
     return np.array(
         [
@@ -489,7 +489,7 @@ def example_matrix_mu(request):
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def A_mu0_init():
     return np.array(
         [
@@ -509,7 +509,7 @@ def A_mu0_init():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def A_mu0():
     return np.array(
         [
@@ -529,7 +529,7 @@ def A_mu0():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def svecs_mu0():
     return np.array(
         [
@@ -579,7 +579,7 @@ def svecs_mu0():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def A_mu0_krylov_sparse_init() -> np.ndarray:
     return np.array(
         [
@@ -591,7 +591,7 @@ def A_mu0_krylov_sparse_init() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def A_mu0_krylov_sparse() -> np.ndarray:
     return np.array(
         [
@@ -603,7 +603,7 @@ def A_mu0_krylov_sparse() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def svecs_mu0_krylov_sparse(A_mu0) -> np.ndarray:
     return np.array(
         [
@@ -621,7 +621,7 @@ def svecs_mu0_krylov_sparse(A_mu0) -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def A_mu0_krylov_dense_init() -> np.ndarray:
     return np.array(
         [
@@ -633,7 +633,7 @@ def A_mu0_krylov_dense_init() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def A_mu0_krylov_dense() -> np.ndarray:
     return np.array(
         [
@@ -645,7 +645,7 @@ def A_mu0_krylov_dense() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def svecs_mu0_krylov_dense(A_mu0) -> np.ndarray:
     return np.array(
         [
@@ -663,7 +663,7 @@ def svecs_mu0_krylov_dense(A_mu0) -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def A_mu1000_init():
     return np.array(
         [
@@ -707,7 +707,7 @@ def A_mu1000_init():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def A_mu1000():
     return np.array(
         [
@@ -751,7 +751,7 @@ def A_mu1000():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def svecs_mu1000():
     return np.array(
         [
@@ -823,7 +823,7 @@ def svecs_mu1000():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def chi_isa_mu0_n3():
     return np.array(
         [
@@ -873,7 +873,7 @@ def chi_isa_mu0_n3():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def chi_isa_mu100_n3():
     return np.array(
         [
@@ -923,7 +923,7 @@ def chi_isa_mu100_n3():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def count():
     return np.array(
         [
@@ -2780,19 +2780,19 @@ def count():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def P(count: np.ndarray) -> np.ndarray:
     P, _ = get_known_input(count)
     return P
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def sd(count: np.ndarray) -> np.ndarray:
     _, sd = get_known_input(count)
     return sd
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def P_mu(P: np.ndarray) -> np.ndarray:
     return np.array(
         [
@@ -2844,7 +2844,7 @@ def P_mu(P: np.ndarray) -> np.ndarray:
 
 
 # this is an irreducible matrix
-@pytest.fixture(scope="session")
+@pytest.fixture
 def P_2():
     return np.array(
         [
@@ -2865,7 +2865,7 @@ def P_2():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 # this is a reducible matrix with one recurrent and one transient class
 def P_3():
     return np.array(
@@ -2887,7 +2887,7 @@ def P_3():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 # this is a reducible matrix with two recurrent and one transient class
 def P_4():
     return np.array(
@@ -2909,7 +2909,7 @@ def P_4():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 # this is a reducible matrix with one absorbing state
 def P_5():
     return np.array(
@@ -2931,7 +2931,7 @@ def P_5():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 # this is a reducible matrix with two absorbing states
 def P_6():
     return np.array(
@@ -2953,7 +2953,7 @@ def P_6():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 # this is a reducible matrix with 1 absorbing state, one recurrent and one transient class
 def P_7():
     return np.array(
@@ -2989,7 +2989,7 @@ def P_i(
     return locals()[request.param]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def minChi_P_2_LM() -> np.ndarray:
     return np.array(
         [
@@ -3009,7 +3009,7 @@ def minChi_P_2_LM() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def crispness_values_P_2_LM() -> np.ndarray:
     return np.array(
         [
@@ -3029,17 +3029,17 @@ def crispness_values_P_2_LM() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def optimal_crispness_P_2_LM() -> np.float64:
     return 0.8151280474517894
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def n_m_P_2_LM() -> np.int64:
     return 3
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def top_eigenvalues_P_2_LM() -> np.ndarray:
     return np.array(
         [
@@ -3060,7 +3060,7 @@ def top_eigenvalues_P_2_LM() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def minChi_P_2_LR() -> np.ndarray:
     return np.array(
         [
@@ -3080,7 +3080,7 @@ def minChi_P_2_LR() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def crispness_values_P_2_LR() -> np.ndarray:
     return np.array(
         [
@@ -3100,17 +3100,17 @@ def crispness_values_P_2_LR() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def optimal_crispness_P_2_LR() -> np.float64:
     return 0.8341426886998387
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def n_m_P_2_LR() -> np.int64:
     return 8
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def top_eigenvalues_P_2_LR() -> np.ndarray:
     return np.array(
         [
@@ -3131,7 +3131,7 @@ def top_eigenvalues_P_2_LR() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def M_1() -> np.ndarray:
     return np.array(
         [
@@ -3144,7 +3144,7 @@ def M_1() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def M_2() -> np.ndarray:
     return np.array(
         [
@@ -3157,7 +3157,7 @@ def M_2() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def M_3() -> np.ndarray:
     return np.array(
         [
@@ -3170,7 +3170,7 @@ def M_3() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def M_4() -> np.ndarray:
     return np.array(
         [
@@ -3183,7 +3183,7 @@ def M_4() -> np.ndarray:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def M_5() -> np.ndarray:
     return np.array(
         [
@@ -3209,7 +3209,7 @@ def R_i(
     return locals()[request.param]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def test_matrix_1() -> np.ndarray:
     """
     Transition matrix for a Markov chain with 11 states.
@@ -3250,7 +3250,7 @@ def test_matrix_1() -> np.ndarray:
     return p
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def test_matrix_1_stationary_distribution() -> np.ndarray:
     """
     Stationary distribution for `test_matrix_1`
@@ -3284,7 +3284,7 @@ def test_matrix_1_stationary_distribution() -> np.ndarray:
     return pi
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def test_matrix_1_eigenvalues() -> np.ndarray:
     """
     Eigenvalues for `test_matrix_1`.
@@ -3317,7 +3317,7 @@ def test_matrix_1_eigenvalues() -> np.ndarray:
     return eigs
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def test_matrix_1_eigenvectors() -> np.ndarray:
     """
     Eigenvectors for `test_matrix_1`.
@@ -3495,7 +3495,7 @@ def test_matrix_1_eigenvectors() -> np.ndarray:
     return vecs
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def test_matrix_2() -> np.ndarray:
     """
     Transition matrix for a Markov chain with 13 states.
@@ -3539,7 +3539,7 @@ def test_matrix_2() -> np.ndarray:
     return p
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def test_matrix_2_stationary_distribution() -> np.ndarray:
     """
     Stationary distribution for `test_matrix_2`.
@@ -3558,7 +3558,7 @@ def test_matrix_2_stationary_distribution() -> np.ndarray:
     return pi
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def test_matrix_2_eigenvalues() -> np.ndarray:
     """
     Eigenvalues for `test_matrix_2`.
@@ -3593,7 +3593,7 @@ def test_matrix_2_eigenvalues() -> np.ndarray:
     return eigs
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def test_matrix_2_eigenvectors() -> np.ndarray:
     """
     Eigenvectors for `test_matrix_2`.
@@ -3825,7 +3825,7 @@ def test_matrix_2_eigenvectors() -> np.ndarray:
     return vecs
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def test_matrix_3() -> np.ndarray:
     """
     Definition of test_matrix_3.
