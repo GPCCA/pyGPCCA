@@ -1,5 +1,33 @@
 # References
 
+```{eval-rst}
+.. [Reuter19]
+    Bernhard Reuter, Konstantin Fackeldey, and Marcus Weber,
+    *Generalized Markov modeling of nonreversible molecular kinetics*,
+    The Journal of Chemical Physics, 150(17):174103, 2019.
+    `doi:10.1063/1.5064530 <https://doi.org/10.1063/1.5064530>`__.
+
+.. [Reuter18]
+    Bernhard Reuter, Marcus Weber, Konstantin Fackeldey, Susanna Röblitz, and Martin E. Garcia,
+    *Generalized Markov State Modeling Method for Nonequilibrium Biomolecular Dynamics: Exemplified on Amyloid β
+    Conformational Dynamics Driven by an Oscillating Electric Field.*,
+    Journal of Chemical Theory and Computation, 14(7):3579–3594, 2018.
+    `doi:10.1021/acs.jctc.8b00079 <https://doi.org/10.1021/acs.jctc.8b00079>`__.
+
+.. [Brandts02]
+    Jan H. Brandts,
+    *Matlab code for sorting real Schur forms*,
+    Numerical Linear Algebra with Applications, 9(3):249-261, 2002.
+
+.. [Roeblitz13]
+    Susanna Röblitz and Marcus Weber,
+    *Fuzzy spectral clustering by PCCA+: application to Markov state models and data classification.*,
+    Advances in Data Analysis and Classification, 7:147-179, 2013.
+    `doi:10.1007/s11634-013-0134-6 <https://doi.org/10.1007/s11634-013-0134-6>`__.
+```
+
+## Bibliography
+
 ```{bibliography}
 :cited:
 ```
