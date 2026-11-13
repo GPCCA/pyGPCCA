@@ -6,6 +6,26 @@ requires = [ "hatch-vcs", "hatchling" ]
 name = "pygpcca"
 description = "Generalized Perron Cluster Cluster Analysis program to coarse-grain reversible and non-reversible Markov state models."
 readme = "README.md"
+keywords = [
+  "cellular dynamics",
+  "cellular kinetics",
+  "coarse-graining",
+  "cyclic states",
+  "G-PCCA",
+  "Generalized Perron Cluster Cluster Analysis",
+  "GPCCA",
+  "Markov state model",
+  "Markov state modeling",
+  "metastable states",
+  "molecular dynamics",
+  "molecular kinetics",
+  "non-autonomous process",
+  "non-equilibrium system",
+  "non-reversible process",
+  "Schur decomposition",
+  "Schur vectors",
+  "spectral clustering",
+]
 license = "LGPL-3.0-or-later"
 license-files = [ "LICENSE", "ThirdPartyNotices.txt" ]
 maintainers = [
@@ -30,26 +50,6 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
   "Topic :: Scientific/Engineering :: Mathematics",
   "Typing :: Typed",
-]
-keywords = [
-  "cellular dynamics",
-  "cellular kinetics",
-  "coarse-graining",
-  "cyclic states",
-  "G-PCCA",
-  "Generalized Perron Cluster Cluster Analysis",
-  "GPCCA",
-  "Markov state model",
-  "Markov state modeling",
-  "metastable states",
-  "molecular dynamics",
-  "molecular kinetics",
-  "non-autonomous process",
-  "non-equilibrium system",
-  "non-reversible process",
-  "Schur decomposition",
-  "Schur vectors",
-  "spectral clustering",
 ]
 dynamic = [ "version" ]
 dependencies = [
@@ -120,6 +120,19 @@ envs.hatch-test.overrides.matrix.deps.env-vars = [
 ]
 envs.hatch-test.dependency-groups = [ "dev", "test" ]
 
+[tool.pixi]
+# PETSc/SLEPc have no wheels on PyPI; this environment takes them from conda-forge: `pixi run -e krylov test`.
+# Not named `slepc`: pixi turns the `slepc` extra into a feature, which would build PETSc from PyPI sources.
+workspace.channels = [ "conda-forge" ]
+workspace.platforms = [ "linux-64", "osx-arm64" ]
+pypi-dependencies.pygpcca = { path = ".", editable = true }
+feature.krylov.dependencies.petsc4py = "*"
+feature.krylov.dependencies.python = ">=3.12"
+feature.krylov.dependencies.slepc4py = "*"
+# one BLAS thread: conda-forge BLAS otherwise oversubscribes cores
+feature.krylov.tasks.test = { cmd = "pytest", env = { OMP_NUM_THREADS = "1" } }
+environments.krylov = [ "krylov", "test" ]
+
 [tool.ruff]
 line-length = 120
 src = [ "src" ]
@@ -155,8 +168,27 @@ lint.ignore = [
 ]
 lint.per-file-ignores."*/__init__.py" = [ "F401" ]
 lint.per-file-ignores."docs/*" = [ "I" ]
+# import-time warning filter and backports sit between imports
+lint.per-file-ignores."src/pygpcca/_gpcca.py" = [ "E402" ]
 lint.per-file-ignores."tests/*" = [ "D" ]
 lint.pydocstyle.convention = "numpy"
+
+[tool.mypy]
+files = [ "src" ]
+disallow_any_generics = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+strict_optional = true
+warn_redundant_casts = true
+warn_unreachable = true
+strict_equality = true
+warn_unused_configs = true
+allow_untyped_decorators = true  # docrep
+no_implicit_optional = true
+no_implicit_reexport = true
+show_error_codes = true
 
 [tool.pytest]
 addopts = [
@@ -172,23 +204,6 @@ run.omit = [
 run.patch = [ "subprocess" ]
 run.source = [ "pygpcca" ]
 
-[tool.mypy]
-files = [ "src" ]
-warn_redundant_casts = true
-warn_unused_configs = true
-disallow_untyped_calls = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-disallow_any_generics = true
-strict_optional = true
-strict_equality = true
-warn_unreachable = true
-check_untyped_defs = true
-allow_untyped_decorators = true # docrep
-no_implicit_optional = true
-no_implicit_reexport = true
-show_error_codes = true
-
 [tool.cruft]
 skip = [
   ".git",
@@ -201,23 +216,3 @@ skip = [
   "docs/references.md",
   "docs/notebooks/example.ipynb",
 ]
-
-# PETSc/SLEPc have no wheels on PyPI; this environment takes them from conda-forge: `pixi run -e slepc test`.
-[tool.pixi.workspace]
-channels = [ "conda-forge" ]
-platforms = [ "linux-64", "osx-arm64" ]
-
-[tool.pixi.pypi-dependencies]
-pygpcca = { path = ".", editable = true }
-
-[tool.pixi.feature.slepc.dependencies]
-python = ">=3.12"
-petsc4py = "*"
-slepc4py = "*"
-
-[tool.pixi.feature.slepc.tasks]
-# one BLAS thread: conda-forge BLAS otherwise oversubscribes cores
-test = { cmd = "pytest", env = { OMP_NUM_THREADS = "1" } }
-
-[tool.pixi.environments]
-slepc = [ "slepc", "test" ]
