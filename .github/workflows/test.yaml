@@ -59,6 +59,10 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         env: ${{ fromJSON(needs.get-environments.outputs.envs) }}
+        include:
+          # PyPI numpy/scipy wheels for macOS 14+ link Apple Accelerate, unlike conda-forge's in the krylov job.
+          - os: macos-latest
+            env: {name: hatch-test.py3.12-stable, label: "hatch-test.py3.12-stable (macOS, Accelerate)", python: "3.12"}
 
     name: ${{ matrix.env.label }}
     runs-on: ${{ matrix.os }}
