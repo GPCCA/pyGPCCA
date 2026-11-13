@@ -45,7 +45,8 @@ __credits__ = [
 ]
 
 
-from typing import Dict, List, Tuple, Union, Literal, Callable, Optional, TYPE_CHECKING
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Literal
 
 try:
     from functools import cached_property  # type: ignore[attr-defined]
@@ -53,13 +54,13 @@ except ImportError:
     from functools import lru_cache
 
     def cached_property(fn: Callable) -> property:  # type: ignore[no-redef,type-arg]
-        """Cached property backport."""  # noqa: D401
+        """Cached property backport."""
         # mypy complains about overriding the same name
         return property(lru_cache(maxsize=1)(fn))
 
 
-import sys
 import logging
+import sys
 
 if not sys.warnoptions:
     import os
@@ -68,21 +69,21 @@ if not sys.warnoptions:
     warnings.simplefilter("always", category=UserWarning)  # Change the filter in this process
     os.environ["PYTHONWARNINGS"] = "always::UserWarning"  # Also affect subprocesses
 
-from scipy.linalg import subspace_angles
-from scipy.sparse import issparse, spmatrix
-from scipy.optimize import fmin
 import numpy as np
 import scipy.sparse as sp
+from scipy.linalg import subspace_angles
+from scipy.optimize import fmin
+from scipy.sparse import issparse, spmatrix
 
-from pygpcca._types import OArray, ArrayLike
+from pygpcca._sorted_schur import _check_conj_split, sorted_schur
+from pygpcca._types import ArrayLike, OArray
+from pygpcca.utils._constants import DEFAULT_SCHUR_METHOD, EPS
 from pygpcca.utils._docs import d
 from pygpcca.utils._utils import (
     connected_sets,
     is_transition_matrix,
     stationary_distribution,
 )
-from pygpcca._sorted_schur import sorted_schur, _check_conj_split
-from pygpcca.utils._constants import EPS, DEFAULT_SCHUR_METHOD
 
 __all__ = ["gpcca_coarsegrain", "GPCCA"]
 
@@ -172,13 +173,13 @@ def _gram_schmidt_mod(X: ArrayLike, eta: ArrayLike) -> ArrayLike:
 
 @d.dedent
 def _do_schur(
-    P: Union[ArrayLike, spmatrix],
+    P: ArrayLike | spmatrix,
     eta: ArrayLike,
     m: int,
     z: Literal["LM", "LR"] = "LM",
     method: str = DEFAULT_SCHUR_METHOD,
     tol_krylov: float = 1e-16,
-) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
+) -> tuple[ArrayLike, ArrayLike, ArrayLike]:
     r"""
     Firstly, a Schur decomposition of the `(n, n)` transition matrix `P`
     is performed, with due regard to the input distribution of states `eta`.
@@ -222,7 +223,7 @@ def _do_schur(
         %(R_sort)s
     eigenvalues
         %(eigenvalues_m)s
-    """  # noqa: D205, D400
+    """  # noqa: D205
     # Exceptions
     N1 = P.shape[0]
     N2 = P.shape[1]
@@ -477,7 +478,7 @@ def _objective(alpha: ArrayLike, X: ArrayLike) -> float:
 
 
 @d.dedent
-def _opt_soft(X: ArrayLike, rot_matrix: ArrayLike) -> Tuple[ArrayLike, ArrayLike, float]:
+def _opt_soft(X: ArrayLike, rot_matrix: ArrayLike) -> tuple[ArrayLike, ArrayLike, float]:
     r"""
     Optimize the G-PCCA rotation matrix such that the memberships are
     exclusively non-negative and compute the membership matrix.
@@ -500,7 +501,7 @@ def _opt_soft(X: ArrayLike, rot_matrix: ArrayLike) -> Tuple[ArrayLike, ArrayLike
     fopt
         Optimal value of the objective function :math:`f_{opt} = m - \\mathtt{trace}(S)`
         (Eq. 16 from [Roeblitz13]_).
-    """  # noqa: D205, D400
+    """  # noqa: D205
     n, m = X.shape
 
     # Sanity checks.
@@ -591,7 +592,7 @@ def _fill_matrix(rot_matrix: ArrayLike, X: ArrayLike) -> ArrayLike:
 
 
 @d.dedent
-def _cluster_by_isa(X: ArrayLike) -> Tuple[ArrayLike, float]:
+def _cluster_by_isa(X: ArrayLike) -> tuple[ArrayLike, float]:
     """
     Classification of dynamical data based on `m` orthonormal Schur vectors of the (row-stochastic) transition matrix.
 
@@ -629,7 +630,7 @@ def _cluster_by_isa(X: ArrayLike) -> Tuple[ArrayLike, float]:
 
 
 @d.dedent
-def _gpcca_core(X: ArrayLike) -> Tuple[ArrayLike, ArrayLike, float]:
+def _gpcca_core(X: ArrayLike) -> tuple[ArrayLike, ArrayLike, float]:
     r"""
     Core of the G-PCCA spectral clustering method with optimized memberships [Reuter18]_, [Reuter19]_.
 
@@ -666,7 +667,7 @@ def _gpcca_core(X: ArrayLike) -> Tuple[ArrayLike, ArrayLike, float]:
 
 
 @d.dedent
-def _coarsegrain(P: Union[ArrayLike, spmatrix], eta: ArrayLike, chi: ArrayLike) -> ArrayLike:
+def _coarsegrain(P: ArrayLike | spmatrix, eta: ArrayLike, chi: ArrayLike) -> ArrayLike:
     r"""
     Coarse-grain `P` such that the (dominant) Perron eigenvalues are preserved.
 
@@ -701,9 +702,9 @@ def _coarsegrain(P: Union[ArrayLike, spmatrix], eta: ArrayLike, chi: ArrayLike) 
 
 @d.dedent
 def gpcca_coarsegrain(
-    P: Union[ArrayLike, spmatrix],
-    m: Union[int, Tuple[int, int], List[int], Dict[str, int]],
-    eta: Optional[ArrayLike] = None,
+    P: ArrayLike | spmatrix,
+    m: int | tuple[int, int] | list[int] | dict[str, int],
+    eta: ArrayLike | None = None,
     z: Literal["LM", "LR"] = "LM",
     method: str = DEFAULT_SCHUR_METHOD,
 ) -> ArrayLike:
@@ -769,8 +770,8 @@ class GPCCA:
 
     def __init__(
         self,
-        P: Union[ArrayLike, spmatrix],
-        eta: Optional[ArrayLike] = None,
+        P: ArrayLike | spmatrix,
+        eta: ArrayLike | None = None,
         z: Literal["LM", "LR"] = "LM",
         method: str = DEFAULT_SCHUR_METHOD,
     ):
@@ -788,7 +789,7 @@ class GPCCA:
         if eta is None:
             eta = np.true_divide(np.ones(P.shape[0]), P.shape[0])
         if len(eta) != n:
-            raise ValueError(f"eta vector length ({len(eta)}) doesn't match with the shape of " f"P[{n}, {n}].")
+            raise ValueError(f"eta vector length ({len(eta)}) doesn't match with the shape of P[{n}, {n}].")
 
         self._P = P.astype(np.float64)
         self._eta: ArrayLike = eta.astype(np.float64)
@@ -805,10 +806,10 @@ class GPCCA:
         self._eigenvalues: OArray = None
         self._top_eigenvalues: OArray = None
 
-        self._m_opt: Optional[int] = None
+        self._m_opt: int | None = None
         self._chi: OArray = None
         self._rot_matrix: OArray = None
-        self._crispness_opt: Optional[float] = None
+        self._crispness_opt: float | None = None
         self._crispness: OArray = None
 
         self._pi: OArray = None
@@ -856,7 +857,7 @@ class GPCCA:
                 self._P, eta=self._eta, m=m, z=self._z, method=self._method
             )
 
-    def minChi(self, m_min: int, m_max: int) -> List[float]:
+    def minChi(self, m_min: int, m_max: int) -> list[float]:
         r"""
         Calculate the minChi indicator (see [Reuter18]_) for every :math:`m \in [m_{min},m_{max}]`.
 
@@ -891,7 +892,7 @@ class GPCCA:
         if TYPE_CHECKING:
             assert isinstance(self._p_X, np.ndarray)
 
-        minChi_list: List[float] = []
+        minChi_list: list[float] = []
         for m in range(m_min, m_max + 1):
             # Xm = np.copy(X[:, :m])
             _, minChi = _cluster_by_isa(self._p_X[:, :m])
@@ -903,7 +904,7 @@ class GPCCA:
     @d.dedent
     def optimize(
         self,
-        m: Union[int, Tuple[int, int], List[int], Dict[str, int]],
+        m: int | tuple[int, int] | list[int] | dict[str, int],
     ) -> "GPCCA":
         r"""
         Full G-PCCA spectral clustering method with optimized memberships [Reuter18]_, [Reuter19]_.
@@ -979,8 +980,7 @@ class GPCCA:
         # validate input
         if max(m_list) > n:
             raise ValueError(
-                f"Number of macrostates `({max(m_list)})` exceeds number "
-                f"of states of the transition matrix `({n})`."
+                f"Number of macrostates `({max(m_list)})` exceeds number of states of the transition matrix `({n})`."
             )
         if min(m_list) in [0, 1]:
             raise ValueError(f"There is no point in clustering into `{m}` clusters.")
@@ -1012,9 +1012,9 @@ class GPCCA:
             assert isinstance(self._p_eigenvalues, np.ndarray)
 
         # Initialize lists to collect results.
-        chi_list: List[ArrayLike] = []
-        rot_matrix_list: List[ArrayLike] = []
-        crispness_list: List[float] = []
+        chi_list: list[ArrayLike] = []
+        rot_matrix_list: list[ArrayLike] = []
+        crispness_list: list[float] = []
         # Iterate over m
         for m in range(min(m_list), max(m_list) + 1):
             if len(self._p_eigenvalues) < m:
@@ -1184,7 +1184,7 @@ class GPCCA:
         return None if self.memberships is None else np.argmax(self.memberships, axis=1)  # type: ignore[return-value]
 
     @property
-    def macrostate_sets(self) -> Optional[List[ArrayLike]]:
+    def macrostate_sets(self) -> list[ArrayLike] | None:
         """
         Crisp clustering using G-PCCA.
 
@@ -1217,17 +1217,17 @@ class GPCCA:
         of each microstate :math:`i` (to be assigned) to each macrostate or cluster :math:`j`.
 
         The rows sum to 1.
-        """  # noqa: D205, D400
+        """  # noqa: D205
         return self._chi
 
     @property
-    def n_m(self) -> Optional[int]:
+    def n_m(self) -> int | None:
         """Optimal number of clusters or macrostates to group the `n` microstates into."""
         return self._m_opt
 
     @property  # type: ignore[misc]
     @d.dedent
-    def optimal_crispness(self) -> Optional[float]:
+    def optimal_crispness(self) -> float | None:
         """
         Crispness for clustering into :attr:`n_m` clusters.
 
@@ -1293,7 +1293,7 @@ class GPCCA:
         return self._eigenvalues
 
     @property
-    def transition_matrix(self) -> Union[ArrayLike, spmatrix]:
+    def transition_matrix(self) -> ArrayLike | spmatrix:
         """Row-stochastic transition matrix `P`."""
         return self._P
 

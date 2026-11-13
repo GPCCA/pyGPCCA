@@ -25,33 +25,31 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import platform
-from typing import Optional
-from operator import itemgetter
+import sys
 from itertools import combinations
+from operator import itemgetter
 
-import pytest
-
-from scipy.linalg import lu, pinv, hilbert, subspace_angles
-from scipy.sparse import issparse, csr_matrix
 import numpy as np
+import pytest
+from scipy.linalg import hilbert, lu, pinv, subspace_angles
+from scipy.sparse import csr_matrix, issparse
 
 from pygpcca._gpcca import (
     GPCCA,
-    _do_schur,
-    _opt_soft,
-    _objective,
-    _gpcca_core,
-    _fill_matrix,
-    _indexsearch,
     _cluster_by_isa,
+    _do_schur,
+    _fill_matrix,
+    _gpcca_core,
     _gram_schmidt_mod,
-    gpcca_coarsegrain,
+    _indexsearch,
     _initialize_rot_matrix,
+    _objective,
+    _opt_soft,
+    gpcca_coarsegrain,
 )
-from tests.conftest import mu, assert_allclose, get_known_input, skip_if_no_petsc_slepc
 from pygpcca._sort_real_schur import sort_real_schur
+from tests.conftest import assert_allclose, get_known_input, mu, skip_if_no_petsc_slepc
 
 eps = np.finfo(np.float64).eps * 1e10
 
@@ -66,7 +64,7 @@ def _assert_schur(
     P: np.ndarray,
     X: np.ndarray,
     RR: np.ndarray,
-    N: Optional[int] = None,
+    N: int | None = None,
     subspace: bool = False,
 ):
     if N is not None:
@@ -1009,7 +1007,7 @@ class TestUtils:
         assert g.transition_matrix.dtype == np.float64
 
     @pytest.mark.parametrize("eta", [None, np.ones((12,), dtype=np.float16) / 12.0])
-    def test_input_distribution_dtype(self, P_2: np.ndarray, eta: Optional[np.ndarray]):
+    def test_input_distribution_dtype(self, P_2: np.ndarray, eta: np.ndarray | None):
         g = GPCCA(P_2, eta=eta, z="LR")
 
         assert g.input_distribution.dtype == np.float64

@@ -1,9 +1,9 @@
+import numpy as np
 from scipy.linalg import subspace_angles
 from scipy.sparse import csr_matrix
-import numpy as np
 
-from tests.conftest import assert_allclose, skip_if_no_petsc_slepc
 from pygpcca.utils._utils import _eigs_slepc
+from tests.conftest import assert_allclose, skip_if_no_petsc_slepc
 
 
 @skip_if_no_petsc_slepc

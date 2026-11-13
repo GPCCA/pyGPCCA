@@ -17,18 +17,17 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import List, Tuple, Union
 from functools import singledispatch
 
-from scipy.linalg import eig, lu_solve, lu_factor
-from scipy.sparse import csgraph, spmatrix, csr_matrix, isspmatrix_csr
-from scipy.sparse.linalg import eigs
 import numpy as np
+from scipy.linalg import eig, lu_factor, lu_solve
+from scipy.sparse import csgraph, csr_matrix, isspmatrix_csr, spmatrix
+from scipy.sparse.linalg import eigs
 
 from pygpcca._types import ArrayLike
-from pygpcca.utils._docs import d
 from pygpcca.utils._checks import ensure_ndarray_or_sparse
 from pygpcca.utils._constants import EPS
+from pygpcca.utils._docs import d
 
 __all__ = [
     "connected_sets",
@@ -38,7 +37,7 @@ __all__ = [
 
 
 @singledispatch
-def connected_sets(C: Union[ArrayLike, spmatrix], directed: bool = True) -> List[ArrayLike]:
+def connected_sets(C: ArrayLike | spmatrix, directed: bool = True) -> list[ArrayLike]:
     """
     Compute connected sets of microstates.
 
@@ -78,12 +77,12 @@ def connected_sets(C: Union[ArrayLike, spmatrix], directed: bool = True) -> List
 
 
 @connected_sets.register(np.ndarray)
-def _csd(C: ArrayLike, directed: bool = True) -> List[ArrayLike]:
+def _csd(C: ArrayLike, directed: bool = True) -> list[ArrayLike]:
     return connected_sets(csr_matrix(C), directed=directed)
 
 
 @connected_sets.register(spmatrix)
-def _css(C: spmatrix, directed: bool = True) -> List[ArrayLike]:
+def _css(C: spmatrix, directed: bool = True) -> list[ArrayLike]:
     if not isspmatrix_csr(C):
         C = csr_matrix(C)
 
@@ -119,7 +118,7 @@ def _css(C: spmatrix, directed: bool = True) -> List[ArrayLike]:
 
 
 @singledispatch
-def is_transition_matrix(T: Union[ArrayLike, spmatrix], tol: float = 1e-12) -> bool:
+def is_transition_matrix(T: ArrayLike | spmatrix, tol: float = 1e-12) -> bool:
     r"""
     Check if the given matrix is a transition matrix.
 
@@ -178,7 +177,7 @@ def _itms(T: ArrayLike, tol: float = 1e-12) -> bool:
 
 @singledispatch
 @d.dedent
-def stationary_distribution(P: Union[ArrayLike, spmatrix]) -> ArrayLike:
+def stationary_distribution(P: ArrayLike | spmatrix) -> ArrayLike:
     r"""
     Compute stationary distribution of stochastic matrix `P`.
 
@@ -224,7 +223,7 @@ def _sdd(P: ArrayLike) -> ArrayLike:
     return mu
 
 
-def _eigs_slepc(P: spmatrix, k: int, which: "str" = "LR", tol: float = EPS) -> Tuple[ArrayLike, ArrayLike]:
+def _eigs_slepc(P: spmatrix, k: int, which: "str" = "LR", tol: float = EPS) -> tuple[ArrayLike, ArrayLike]:
     from petsc4py import PETSc
     from slepc4py import SLEPc
 
@@ -410,7 +409,7 @@ def stationary_distribution_from_eigenvector(P: ArrayLike) -> ArrayLike:
     return nu / np.sum(nu)
 
 
-def _is_stationary_distribution(T: Union[ArrayLike, spmatrix], pi: ArrayLike) -> bool:
+def _is_stationary_distribution(T: ArrayLike | spmatrix, pi: ArrayLike) -> bool:
     # check the shapes
     if not T.shape[0] == T.shape[1] or not T.shape[0] == pi.shape[0]:
         raise ValueError("Shape mismatch.")
@@ -419,7 +418,7 @@ def _is_stationary_distribution(T: Union[ArrayLike, spmatrix], pi: ArrayLike) ->
     if not np.allclose(T.T.dot(pi), pi, rtol=1e6 * EPS, atol=1e6 * EPS):
         dev = np.max(np.abs(T.T.dot(pi) - pi))
         raise ValueError(
-            f"Stationary distribution is not invariant under the transition matrix. Maximal deviation = " f"{dev}"
+            f"Stationary distribution is not invariant under the transition matrix. Maximal deviation = {dev}"
         )
 
     # check for positivity
