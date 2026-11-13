@@ -940,7 +940,7 @@ class GPCCA:
 
 
             - :attr:`coarse_grained_input_distribution`
-            - :attr:`coarse_grained_stationary_distribution`
+            - :attr:`coarse_grained_stationary_probability`
             - :attr:`coarse_grained_transition_matrix`
             - :attr:`crispness_values`
             - :attr:`dominant_eigenvalues`

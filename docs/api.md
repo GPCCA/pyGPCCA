@@ -1,39 +1,31 @@
 # API
 
-## Preprocessing
+_pyGPCCA_ can be imported as:
 
-```{eval-rst}
-.. module:: pygpcca.pp
-.. currentmodule:: pygpcca
-
-.. autosummary::
-    :toctree: generated
-
-    pp.basic_preproc
-    pp.elaborate_example
+```python
+import pygpcca as gp
 ```
 
-## Tools
-
 ```{eval-rst}
-.. module:: pygpcca.tl
+.. module:: pygpcca
 .. currentmodule:: pygpcca
-
-.. autosummary::
-    :toctree: generated
-
-    tl.basic_tool
 ```
 
-## Plotting
+## Functions
 
 ```{eval-rst}
-.. module:: pygpcca.pl
-.. currentmodule:: pygpcca
-
 .. autosummary::
     :toctree: generated
 
-    pl.basic_plot
-    pl.BasicClass
+    stationary_distribution
+    gpcca_coarsegrain
+```
+
+## Classes
+
+```{eval-rst}
+.. autosummary::
+    :toctree: generated
+
+    GPCCA
 ```
