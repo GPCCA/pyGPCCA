@@ -25,6 +25,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
+import platform
 from typing import Optional
 from operator import itemgetter
 from itertools import combinations
@@ -52,6 +54,12 @@ from tests.conftest import mu, assert_allclose, get_known_input, skip_if_no_pets
 from pygpcca._sort_real_schur import sort_real_schur
 
 eps = np.finfo(np.float64).eps * 1e10
+
+xfail_brandts_macos_arm64 = pytest.mark.xfail(
+    sys.platform == "darwin" and platform.machine() == "arm64",
+    reason="brandts returns a non-invariant subspace on macOS arm64, see GPCCA/pyGPCCA#68",
+    strict=True,
+)
 
 
 def _assert_schur(
@@ -526,7 +534,8 @@ class TestGPCCAMatlabUnit:
 
     def test_sort_real_schur(self, R_i: np.ndarray):
         def sort_evals(e: np.ndarray, take: int = 4) -> np.ndarray:
-            return e[np.argsort(np.linalg.norm(np.c_[e.real, e.imag], axis=1))][:take]
+            # break ties between complex conjugates, which have equal modulus
+            return e[np.lexsort((e.imag, e.real, np.abs(e)))][:take]
 
         # test_SRSchur_num_t
         Q = np.eye(4)
@@ -814,7 +823,7 @@ class TestCustom:
 
             assert np.max(subspace_angles(P_i @ X, X @ RR)) < eps
 
-    @pytest.mark.parametrize("method", ["krylov", "brandts"])
+    @pytest.mark.parametrize("method", ["krylov", pytest.param("brandts", marks=xfail_brandts_macos_arm64)])
     def test_P_2_LM(
         self,
         P_2: np.ndarray,
@@ -848,6 +857,7 @@ class TestCustom:
         assert_allclose(g.top_eigenvalues, top_eigenvalues_P_2_LM)
         assert_allclose(g.dominant_eigenvalues, top_eigenvalues_P_2_LM[:n_m])
 
+    @xfail_brandts_macos_arm64
     def test_split_warning_LM(self, P_2: np.ndarray):
         g = GPCCA(P_2, eta=None, z="LM")
 
@@ -876,6 +886,7 @@ class TestCustom:
         ):
             g.optimize({"m_min": 11, "m_max": 12})
 
+    @xfail_brandts_macos_arm64
     def test_split_raise_LM(self, P_2: np.ndarray):
         g = GPCCA(P_2, eta=None, z="LM")
 
@@ -898,7 +909,7 @@ class TestCustom:
         ):
             g.optimize(9)
 
-    @pytest.mark.parametrize("method", ["krylov", "brandts"])
+    @pytest.mark.parametrize("method", ["krylov", pytest.param("brandts", marks=xfail_brandts_macos_arm64)])
     def test_P_2_LR(
         self,
         P_2: np.ndarray,
@@ -933,6 +944,7 @@ class TestCustom:
         assert_allclose(g.top_eigenvalues, top_eigenvalues_P_2_LR)
         assert_allclose(g.dominant_eigenvalues, top_eigenvalues_P_2_LR[:n_m])
 
+    @xfail_brandts_macos_arm64
     def test_split_warning_LR(self, P_2: np.ndarray):
         g = GPCCA(P_2, eta=None, z="LR")
 
@@ -955,6 +967,7 @@ class TestCustom:
         ):
             g.optimize({"m_min": 10, "m_max": 12})
 
+    @xfail_brandts_macos_arm64
     def test_split_raise_LR(self, P_2: np.ndarray):
         g = GPCCA(P_2, eta=None, z="LR")
 
