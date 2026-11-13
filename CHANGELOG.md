@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning][].
 [keep a changelog]: https://keepachangelog.com/
 [semantic versioning]: https://semver.org/
 
+## [Unreleased]
+
+### Fixed
+
+- Detect a cut through a complex conjugate pair whichever eigenvalue of the pair comes first, and return conjugate
+  pairs from `method="brandts"` with the positive imaginary part first. With numpy/scipy linked against Apple
+  Accelerate, `brandts` could cut a pair silently and return a non-invariant subspace
+  [#68](https://github.com/GPCCA/pyGPCCA/issues/68).
+
 ## [1.1.0] - 2026-11-13
 
 ### Fixed

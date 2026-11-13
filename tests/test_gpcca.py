@@ -47,6 +47,7 @@ from pygpcca._gpcca import (
     gpcca_coarsegrain,
 )
 from pygpcca._sort_real_schur import sort_real_schur
+from pygpcca._sorted_schur import _check_conj_split, _schur_eigenvalues, sorted_brandts_schur
 from tests.conftest import assert_allclose, get_known_input, mu, skip_if_no_petsc_slepc
 
 eps = np.finfo(np.float64).eps * 1e10
@@ -999,3 +1000,32 @@ class TestUtils:
         g = GPCCA(P_2, eta=eta, z="LR")
 
         assert g.input_distribution.dtype == np.float64
+
+
+class TestConjugatePairs:
+    @pytest.mark.parametrize("sign", [1, -1])
+    def test_check_conj_split_either_order(self, sign: int):
+        pair = [-0.4 + sign * 0.3j, -0.4 - sign * 0.3j]
+        eigenvalues = np.array([1.0, *pair, 0.2])
+
+        assert _check_conj_split(eigenvalues[:2])
+        assert not _check_conj_split(eigenvalues[:3])
+
+    @pytest.mark.parametrize("sign", [1, -1])
+    def test_schur_eigenvalues_positive_imag_first(self, sign: int):
+        # the same 2x2 block, written with either sign of the off-diagonal entries
+        R = np.array([[1.0, 0.5, 0.1], [0.0, -0.4, sign * 0.5], [0.0, -sign * 0.18, -0.4]])
+
+        eigenvalues = _schur_eigenvalues(R)
+
+        assert_allclose(eigenvalues, [1.0, -0.4 + 0.3j, -0.4 - 0.3j])
+
+    @pytest.mark.parametrize("z", ["LM", "LR"])
+    def test_sorted_brandts_schur_positive_imag_first(self, P_2: np.ndarray, z: str):
+        _, _, eigenvalues = sorted_brandts_schur(P_2, k=P_2.shape[0], z=z)
+
+        for i in np.flatnonzero(np.abs(eigenvalues.imag) > 1e-12):
+            if eigenvalues[i].imag > 0:
+                assert eigenvalues[i + 1] == np.conj(eigenvalues[i])
+            else:
+                assert eigenvalues[i - 1] == np.conj(eigenvalues[i])

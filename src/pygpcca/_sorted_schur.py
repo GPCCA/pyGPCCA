@@ -39,7 +39,7 @@ if not sys.warnoptions:
     os.environ["PYTHONWARNINGS"] = "always::UserWarning"  # Also affect subprocesses
 
 import numpy as np
-from scipy.linalg import rsf2csf, schur, subspace_angles
+from scipy.linalg import schur, subspace_angles
 from scipy.sparse import csr_matrix, issparse, isspmatrix_csr, spmatrix
 
 from pygpcca._sort_real_schur import sort_real_schur
@@ -106,10 +106,33 @@ def _check_conj_split(eigenvalues: ArrayLike) -> bool:
     """
     last_eigenvalue, second_last_eigenvalue = eigenvalues[-1], eigenvalues[-2]
     splits_block = False
-    if last_eigenvalue.imag > EPS:
+    if abs(last_eigenvalue.imag) > EPS:
         splits_block = not np.isclose(last_eigenvalue, np.conj(second_last_eigenvalue))
 
     return splits_block
+
+
+def _schur_eigenvalues(R: ArrayLike) -> ArrayLike:
+    """
+    Read the eigenvalues off the diagonal blocks of a real Schur form.
+
+    Parameters
+    ----------
+    R
+        Quasi-upper-triangular real Schur form, with zeros below the diagonal outside its 2x2 blocks.
+
+    Returns
+    -------
+    Eigenvalues in diagonal order; each complex conjugate pair has the positive imaginary part first.
+    """
+    eigenvalues = np.diag(R).astype(np.complex128)
+    i = np.flatnonzero(np.diag(R, -1))  # top-left corners of the 2x2 blocks
+    a, b, c, d = R[i, i], R[i, i + 1], R[i + 1, i], R[i + 1, i + 1]
+    mid = (a + d) / 2
+    imag = np.sqrt(np.maximum(-(((a - d) / 2) ** 2 + b * c), 0.0))
+    eigenvalues[i] = mid + 1j * imag
+    eigenvalues[i + 1] = mid - 1j * imag
+    return eigenvalues
 
 
 @d.dedent
@@ -336,9 +359,7 @@ def sorted_brandts_schur(P: ArrayLike, k: int, z: Literal["LM", "LR"] = "LM") ->
     if np.any(np.array(ap) > 1.0):
         warnings.warn("Reordering of Schur matrix was inaccurate.", stacklevel=2)
 
-    # compute eigenvalues
-    T, _ = rsf2csf(R, Q)
-    eigenvalues = np.diag(T)[:k]
+    eigenvalues = _schur_eigenvalues(R)[:k]
 
     return R, Q, eigenvalues
 
