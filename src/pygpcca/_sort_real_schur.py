@@ -194,8 +194,7 @@ def sort_real_schur(
 
 def normalize(U: ArrayLike, S: ArrayLike, v: slice | list[int], inplace: bool = False) -> tuple[ArrayLike, ArrayLike]:
     """
-    Apply a Givens rotation such that the two-by-two diagonal block of `S` situated at diagonal positions \
-    ``v[0]``, ``v[1]`` is in standardized form.
+    Apply a Givens rotation such that the two-by-two diagonal block of `S` situated at diagonal positions ``v[0]``, ``v[1]`` is in standardized form.
 
     I.e., the diagonal entries are equal, and the off-diagonal elements are of opposite sign.
 
@@ -285,8 +284,7 @@ def rot(X: ArrayLike) -> ArrayLike:
 @d.dedent
 def swaplist(p: ArrayLike | list[float], s: list[int], z: Literal["LM", "LR"], b: float) -> list[int]:
     """
-    Produce a list `v` of swaps of neighboring blocks needed to order the eigenvalues assembled in the vector `p` \
-    from closest to `z` to farthest away from `z`, taking into account the parameter `b`.
+    Produce a list `v` of swaps of neighboring blocks needed to order the eigenvalues assembled in the vector `p` from closest to `z` to farthest away from `z`, taking into account the parameter `b`.
 
     To do so, Python's :func:`sorted`, producing a stable sort, is used to realize
     the objective ordering of the diagonal blocks. This objective ordering
@@ -318,7 +316,7 @@ def swaplist(p: ArrayLike | list[float], s: list[int], z: Literal["LM", "LR"], b
     k = 0
     v: list[int] = []
     srtd = 0  # Number of sorted eigenvalues.
-    q = list(np.diff(s))  # Compute block sizes.
+    q = list(map(int, np.diff(s)))  # Compute block sizes.
     q_orig = list(q)  # debug
     fini = False
     while not fini:

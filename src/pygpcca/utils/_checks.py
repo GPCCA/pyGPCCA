@@ -138,7 +138,7 @@ def assert_petsc_real_scalar_type() -> None:
                 "Please recompile PETSc with `--with-scalar-type=real` or "
                 "provide alternative `PETSC_ARCH=...` with correct scalar type."
             )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         logging.error(
             f"Unable to determine PETSc's scalar type. Reason: `{e}`. Assuming true, "
             f"but please ensure that PETSc was compiled using `--with-scalar-type=real`.",

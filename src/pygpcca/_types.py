@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -12,4 +12,4 @@ except (ImportError, TypeError):
     ArrayLike = np.ndarray  # type: ignore[misc]
 
 
-OArray = Optional[ArrayLike]
+OArray = ArrayLike | None
