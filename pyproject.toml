@@ -1,54 +1,223 @@
 [build-system]
-requires = ["setuptools>=61", "setuptools-scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
+requires = [ "hatch-vcs", "hatchling" ]
 
-[tool.setuptools_scm]
+[project]
+name = "pygpcca"
+description = "Generalized Perron Cluster Cluster Analysis program to coarse-grain reversible and non-reversible Markov state models."
+readme = "README.md"
+license = "LGPL-3.0-or-later"
+license-files = [ "LICENSE", "ThirdPartyNotices.txt" ]
+maintainers = [
+  { name = "Bernhard Reuter", email = "bernhard-reuter@gmx.de" },
+  { name = "Marius Lange", email = "marius.lange@bsse.ethz.ch" },
+]
+authors = [
+  { name = "Bernhard Reuter" },
+  { name = "Michal Klein" },
+  { name = "Marius Lange" },
+]
+requires-python = ">=3.12"
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Science/Research",
+  "Natural Language :: English",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Typing :: Typed",
+]
+keywords = [
+  "cellular dynamics",
+  "cellular kinetics",
+  "coarse-graining",
+  "cyclic states",
+  "G-PCCA",
+  "Generalized Perron Cluster Cluster Analysis",
+  "GPCCA",
+  "Markov state model",
+  "Markov state modeling",
+  "metastable states",
+  "molecular dynamics",
+  "molecular kinetics",
+  "non-autonomous process",
+  "non-equilibrium system",
+  "non-reversible process",
+  "Schur decomposition",
+  "Schur vectors",
+  "spectral clustering",
+]
+dynamic = [ "version" ]
+dependencies = [
+  "docrep>=0.3.1",
+  "numpy>=1.19",
+  "scipy>=1.5",
+  # for debug logging (referenced from the issue template)
+  "session-info2",
+]
+# https://gitlab.com/petsc/petsc/-/issues/803
+optional-dependencies.slepc = [
+  "mpi4py>=3.0.3",
+  "petsc>=3.18",
+  "petsc4py>=3.18",
+  "slepc>=3.18",
+  "slepc4py>=3.18",
+]
+# https://docs.pypi.org/project_metadata/#project-urls
+urls.Documentation = "https://pygpcca.readthedocs.io/"
+urls.Homepage = "https://github.com/GPCCA/pyGPCCA"
+urls.Source = "https://github.com/GPCCA/pyGPCCA"
 
-[tool.black]
+[dependency-groups]
+dev = [
+  "prek",
+  "twine>=4.0.2",
+]
+test = [
+  "coverage>=7.10",
+  "pytest",
+  "pytest-cov",     # For VS Code’s coverage functionality
+  "pytest-mock",
+]
+doc = [
+  "ipykernel",
+  "ipython",
+  "myst-nb>=1.1",
+  "pandas",
+  "scverse-misc[sphinx]>=0.1.2",
+  "sphinx>=8.1",
+  "sphinx-autodoc-typehints",
+  "sphinx-book-theme>=1",
+  "sphinx-copybutton",
+  "sphinx-design",
+  "sphinxcontrib-bibtex>=1",
+  "sphinxcontrib-katex",
+  "sphinxext-opengraph",
+]
+
+[tool.hatch]
+version.source = "vcs"
+envs.default.installer = "uv"
+envs.default.dependency-groups = [ "dev" ]
+envs.docs.scripts.build = "sphinx-build -M html docs docs/_build -W {args}"
+envs.docs.scripts.clean = "git clean -fdX -- {args:docs}"
+envs.docs.scripts.open = "python -m webbrowser -t docs/_build/html/index.html"
+envs.docs.dependency-groups = [ "doc" ]
+envs.hatch-test.matrix = [
+  # Test the lowest and highest supported Python versions with normal deps
+  { deps = [ "stable" ], python = [ "3.12", "3.14" ] },
+  # Test the newest supported Python version also with pre-release deps
+  { deps = [ "pre" ], python = [ "3.14" ] },
+]
+# If the matrix variable `deps` is set to "pre",
+# set the environment variable `UV_PRERELEASE` to "allow".
+envs.hatch-test.overrides.matrix.deps.env-vars = [
+  { value = "allow", key = "UV_PRERELEASE", if = [ "pre" ] },
+]
+envs.hatch-test.dependency-groups = [ "dev", "test" ]
+
+[tool.ruff]
 line-length = 120
-target-version = ['py38']
-include = '\.pyi?$'
-exclude = '''
-(
-  /(
-      \.eggs
-    | \.git
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-  )/
+src = [ "src" ]
+extend-include = [ "*.ipynb" ]
+format.docstring-code-format = true
+lint.select = [
+  "B",      # flake8-bugbear
+  "BLE",    # flake8-blind-except
+  "C4",     # flake8-comprehensions
+  "D",      # pydocstyle
+  "E",      # Error detected by Pycodestyle
+  "F",      # Errors detected by Pyflakes
+  "I",      # isort
+  "RUF100", # Report unused noqa directives
+  "TID",    # flake8-tidy-imports
+  "UP",     # pyupgrade
+  "W",      # Warning detected by Pycodestyle
+]
+lint.ignore = [
+  "B008", # Errors from function calls in argument defaults. These are fine when the result is immutable.
+  "D100", # Missing docstring in public module
+  "D104", # Missing docstring in public package
+  "D105", # __magic__ methods are often self-explanatory, allow missing docstrings
+  "D107", # Missing docstring in __init__
+  # Disable one in each pair of mutually incompatible rules
+  "D203", # We don’t want a blank line before a class docstring
+  "D213", # <> We want docstrings to start immediately after the opening triple quote
+  "D400", # first line should end with a period [Bug: doesn’t work with single-line docstrings]
+  "D401", # First line should be in imperative mood; try rephrasing
+  "E501", # line too long -> we accept long comment lines; formatter gets rid of long code lines
+  "E731", # Do not assign a lambda expression, use a def -> lambda expression assignments are convenient
+  "E741", # allow I, O, l as variable names -> I is the identity matrix
+]
+lint.per-file-ignores."*/__init__.py" = [ "F401" ]
+lint.per-file-ignores."docs/*" = [ "I" ]
+lint.per-file-ignores."tests/*" = [ "D" ]
+lint.pydocstyle.convention = "numpy"
 
-)
-'''
+[tool.pytest]
+addopts = [
+  "--import-mode=importlib", # allow using test files with same name
+]
+strict = true
+testpaths = [ "tests" ]
 
-[tool.isort]
-profile = "black"
-py_version = "38"
-skip = "docs/source/conf.py,.tox,build"
-line_length = 88
-multi_line_output = 3
-include_trailing_comma = true
-use_parentheses = true
-known_num = "numpy,scipy"
-sections = "FUTURE,STDLIB,THIRDPARTY,NUM,FIRSTPARTY,LOCALFOLDER"
-no_lines_before="LOCALFOLDER"
-balanced_wrapping = true
-force_grid_wrap = 0
-length_sort = "1"
-indent = "    "
-from_first = true
-order_by_type = true
-atomic = true
-combine_star = true
-combine_as_imports = true
-honor_noqa = true
-remove_redundant_aliases = true
-only_modified = true
-group_by_package = true
-force_alphabetical_sort_within_sections = true
-lexicographical = true
+[tool.coverage]
+run.omit = [
+  "**/test_*.py",
+]
+run.patch = [ "subprocess" ]
+run.source = [ "pygpcca" ]
+
+[tool.mypy]
+files = [ "src" ]
+warn_redundant_casts = true
+warn_unused_configs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_any_generics = true
+strict_optional = true
+strict_equality = true
+warn_unreachable = true
+check_untyped_defs = true
+allow_untyped_decorators = true # docrep
+no_implicit_optional = true
+no_implicit_reexport = true
+show_error_codes = true
+
+[tool.cruft]
+skip = [
+  ".git",
+  "tests",
+  "src/**/__init__.py",
+  "src/**/basic.py",
+  "docs/api.md",
+  "docs/changelog.md",
+  "docs/references.bib",
+  "docs/references.md",
+  "docs/notebooks/example.ipynb",
+]
+
+# PETSc/SLEPc have no wheels on PyPI; this environment takes them from conda-forge: `pixi run -e slepc test`.
+[tool.pixi.workspace]
+channels = [ "conda-forge" ]
+platforms = [ "linux-64", "osx-arm64" ]
+
+[tool.pixi.pypi-dependencies]
+pygpcca = { path = ".", editable = true }
+
+[tool.pixi.feature.slepc.dependencies]
+python = ">=3.12"
+petsc4py = "*"
+slepc4py = "*"
+
+[tool.pixi.feature.slepc.tasks]
+# one BLAS thread: conda-forge BLAS otherwise oversubscribes cores
+test = { cmd = "pytest", env = { OMP_NUM_THREADS = "1" } }
+
+[tool.pixi.environments]
+slepc = [ "slepc", "test" ]
