@@ -257,7 +257,7 @@ def _eigs_slepc(P: spmatrix, k: int, which: "str" = "LR", tol: float = EPS) -> t
         # Get the i-th eigenvalue as computed by solve().
         eigenvalues.append(E.getEigenpair(i, xr, xi))
         if eigenvalues[-1].imag != 0.0:
-            eigenvectors.append([complex(r, i) for r, i in zip(xr.getArray(), xi.getArray())])
+            eigenvectors.append([complex(r, i) for r, i in zip(xr.getArray(), xi.getArray(), strict=False)])
         else:
             eigenvectors.append(list(xr.getArray()))
 

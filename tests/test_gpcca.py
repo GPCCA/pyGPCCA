@@ -503,7 +503,7 @@ class TestGPCCAMatlabUnit:
 
     def test_cluster_by_isa(self, chi_isa_mu0_n3: np.ndarray, chi_isa_mu100_n3: np.ndarray):
         # chi_sa_mu0_n3 has permuted 2nd and 3d columns when compared to the matlab version
-        for mu_, chi_exp in zip([0, 100], [chi_isa_mu0_n3, chi_isa_mu100_n3]):
+        for mu_, chi_exp in zip([0, 100], [chi_isa_mu0_n3, chi_isa_mu100_n3], strict=True):
             P, sd = get_known_input(mu(mu_))
             X, _, _ = _do_schur(P, sd, m=3)
             chi, _ = _cluster_by_isa(X[:, :3])
@@ -766,9 +766,9 @@ class TestPETScSLEPc:
         g_kd = GPCCA(P, method="krylov").optimize(3)
 
         for g in [g_ks, g_kd]:
-            g.schur_vectors
+            _ = g.schur_vectors
             _initialize_rot_matrix(sd)
-            g.rotation_matrix
+            _ = g.rotation_matrix
 
     def test_init_final_rot_matrix_krylov_sparse(
         self,
