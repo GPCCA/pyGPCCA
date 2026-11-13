@@ -59,6 +59,10 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         env: ${{ fromJSON(needs.get-environments.outputs.envs) }}
+        include:
+          # PyPI numpy/scipy wheels on macOS 14+ link Apple Accelerate (#68).
+          - os: macos-latest
+            env: {name: hatch-test.py3.12-stable, label: "hatch-test.py3.12-stable (macOS, Accelerate)", python: "3.12"}
 
     name: ${{ matrix.env.label }}
     runs-on: ${{ matrix.os }}
@@ -78,6 +82,9 @@ jobs:
         run: uvx hatch env create ${{ matrix.env.name }}
       - name: list all all installed package versions
         run: uvx hatch run ${{ matrix.env.name }}:uv pip list
+      - name: diagnose Accelerate (throwaway, #68)
+        if: runner.os == 'macOS'
+        run: uvx hatch run ${{ matrix.env.name }}:python .github/scripts/diag_accelerate.py
       - name: run tests using hatch
         env:
           MPLBACKEND: agg
