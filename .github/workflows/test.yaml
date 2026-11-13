@@ -96,6 +96,40 @@ jobs:
           fail_ci_if_error: true
           use_oidc: true
 
+  # PETSc/SLEPc (method="krylov") have no PyPI wheels; the pixi environment in pyproject.toml takes them from
+  # conda-forge. No lockfile, so new petsc4py/slepc4py releases are tested as they appear.
+  test-krylov:
+    permissions:
+      id-token: write  # for codecov OIDC
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    name: krylov (PETSc/SLEPc, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          filter: blob:none
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: prefix-dev/setup-pixi@9936258fee697aff89b3fed6ca1f80a382ef694e # v0.11.3
+        with:
+          environments: krylov
+          locked: false
+          cache: false
+      - name: list all installed package versions
+        run: pixi list -e krylov
+      - name: run tests
+        run: pixi run -e krylov test -v --color=yes --cov --cov-report=xml
+      - name: Upload coverage
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          fail_ci_if_error: true
+          use_oidc: true
+          flags: krylov
+
   # Check that all tests defined above pass. This makes it easy to set a single "required" test in branch
   # protection instead of having to update it frequently. See https://github.com/re-actors/alls-green#why.
   check:
@@ -104,6 +138,7 @@ jobs:
     needs:
       - get-environments
       - test
+      - test-krylov
     runs-on: ubuntu-latest
     steps:
         - uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # v1.2.2
