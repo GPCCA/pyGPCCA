@@ -25,21 +25,19 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Tuple
 import warnings
 
-import pytest
-
-from scipy.sparse import diags
-from numpy.testing import assert_allclose as assert_allclose_np
 import numpy as np
+import pytest
+from numpy.testing import assert_allclose as assert_allclose_np
+from scipy.sparse import diags
 
 
 def assert_allclose(actual, desired, rtol=1.0e-5, atol=1.0e-8, err_msg="", verbose=True):
     return assert_allclose_np(actual, desired, rtol=rtol, atol=atol, err_msg=err_msg, verbose=True)
 
 
-def get_known_input(Tc: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+def get_known_input(Tc: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     assert not np.allclose(Tc, 0.0), "Tc doesn't seem to be a count matrix."
     assert Tc.dtype == np.float64, "Expected double precision"
     assert Tc.shape[0] == Tc.shape[1], "Expected a square matrix."
@@ -54,7 +52,7 @@ def get_known_input(Tc: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     return P, sd / np.sum(sd)
 
 
-def bdc(q: np.ndarray, p: np.ndarray, sparse: bool = True) -> Tuple[np.ndarray, np.ndarray]:
+def bdc(q: np.ndarray, p: np.ndarray, sparse: bool = True) -> tuple[np.ndarray, np.ndarray]:
     """Birth death chain."""
     q, p = np.asarray(q), np.asarray(p)
     if q[0] != 0.0:

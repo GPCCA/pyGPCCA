@@ -1,20 +1,17 @@
-from typing import Tuple
-
-import pytest
-
-from scipy.sparse import issparse, csr_matrix
 import numpy as np
+import pytest
+from scipy.sparse import csr_matrix, issparse
 
-from tests.conftest import bdc, assert_allclose
 from pygpcca.utils._utils import (
-    stationary_distribution,
     _is_stationary_distribution,
-    stationary_distribution_from_eigenvector,
+    stationary_distribution,
     stationary_distribution_from_backward_iteration,
+    stationary_distribution_from_eigenvector,
 )
+from tests.conftest import assert_allclose, bdc
 
 
-def _create_qp(dim: int) -> Tuple[np.array, np.array]:
+def _create_qp(dim: int) -> tuple[np.array, np.array]:
     p = np.zeros(dim)
     p[0:-1] = 0.5
 

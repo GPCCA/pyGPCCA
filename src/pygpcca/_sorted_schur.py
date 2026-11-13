@@ -28,8 +28,8 @@
 # You should have received a copy of the GNU Lesser General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 # --------------------------------------------------------------------------------------------------------------------
-from typing import Tuple, Union, Literal
 import sys
+from typing import Literal
 
 if not sys.warnoptions:
     import os
@@ -38,15 +38,15 @@ if not sys.warnoptions:
     warnings.simplefilter("always", category=UserWarning)  # Change the filter in this process
     os.environ["PYTHONWARNINGS"] = "always::UserWarning"  # Also affect subprocesses
 
-from scipy.linalg import schur, rsf2csf, subspace_angles
-from scipy.sparse import issparse, spmatrix, csr_matrix, isspmatrix_csr
 import numpy as np
+from scipy.linalg import rsf2csf, schur, subspace_angles
+from scipy.sparse import csr_matrix, issparse, isspmatrix_csr, spmatrix
 
-from pygpcca._types import ArrayLike
-from pygpcca.utils._docs import d
-from pygpcca.utils._checks import assert_petsc_real_scalar_type
 from pygpcca._sort_real_schur import sort_real_schur
-from pygpcca.utils._constants import EPS, DEFAULT_SCHUR_METHOD, NO_PETSC_SLEPC_FOUND_MSG
+from pygpcca._types import ArrayLike
+from pygpcca.utils._checks import assert_petsc_real_scalar_type
+from pygpcca.utils._constants import DEFAULT_SCHUR_METHOD, EPS, NO_PETSC_SLEPC_FOUND_MSG
+from pygpcca.utils._docs import d
 
 try:
     import petsc4py
@@ -59,7 +59,7 @@ except (ImportError, TypeError):
 __all__ = ["sorted_schur"]
 
 
-def _initialize_matrix(M: "petsc4py.PETSc.Mat", P: Union[ArrayLike, spmatrix]) -> None:
+def _initialize_matrix(M: "petsc4py.PETSc.Mat", P: ArrayLike | spmatrix) -> None:
     """
     Initialize PETSc matrix.
 
@@ -190,8 +190,8 @@ def _check_schur(P: ArrayLike, Q: ArrayLike, R: ArrayLike, eigenvalues: ArrayLik
 
 @d.dedent
 def sorted_krylov_schur(
-    P: Union[spmatrix, ArrayLike], k: int, z: Literal["LM", "LR"] = "LM", tol: float = 1e-16
-) -> Tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
+    P: spmatrix | ArrayLike, k: int, z: Literal["LM", "LR"] = "LM", tol: float = 1e-16
+) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
     r"""
     Calculate an orthonormal basis of the subspace associated with the `k`
     dominant eigenvalues of `P` using the Krylov-Schur method as implemented in SLEPc.
@@ -221,7 +221,7 @@ def sorted_krylov_schur(
     eigenvalues_error
         Array of shape `(k,)` containing the error, based on the residual
         norm, of the `i`th eigenpair at index `i`.
-    """  # noqa: D205, D400
+    """  # noqa: D205
     # We like to thank A. Sikorski and M. Weber for pointing us to SLEPc for partial Schur decompositions of
     # sparse matrices.
     # Further parts of sorted_krylov_schur were developed based on the function krylov_schur
@@ -302,7 +302,7 @@ def sorted_krylov_schur(
 
 
 @d.dedent
-def sorted_brandts_schur(P: ArrayLike, k: int, z: Literal["LM", "LR"] = "LM") -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
+def sorted_brandts_schur(P: ArrayLike, k: int, z: Literal["LM", "LR"] = "LM") -> tuple[ArrayLike, ArrayLike, ArrayLike]:
     """
     Compute a sorted Schur decomposition.
 
@@ -345,12 +345,12 @@ def sorted_brandts_schur(P: ArrayLike, k: int, z: Literal["LM", "LR"] = "LM") ->
 
 @d.dedent
 def sorted_schur(
-    P: Union[ArrayLike, spmatrix],
+    P: ArrayLike | spmatrix,
     m: int,
     z: Literal["LM", "LR"] = "LM",
     method: str = DEFAULT_SCHUR_METHOD,
     tol_krylov: float = 1e-16,
-) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
+) -> tuple[ArrayLike, ArrayLike, ArrayLike]:
     """
     Return ``m`` dominant real Schur vectors or an orthonormal basis spanning the same invariant subspace.
 

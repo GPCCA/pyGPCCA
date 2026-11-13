@@ -1,8 +1,7 @@
-from typing import Tuple, Union, Optional
 import logging
 
-from scipy.sparse import issparse, spmatrix
 import numpy as np
+from scipy.sparse import issparse, spmatrix
 
 from pygpcca._types import ArrayLike
 from pygpcca.utils._docs import d
@@ -12,13 +11,13 @@ __all__ = ["ensure_ndarray_or_sparse", "assert_petsc_real_scalar_type"]
 
 @d.get_sections(base="assert_array", sections=["Parameters"])
 def assert_array(
-    A: Union[ArrayLike, spmatrix],
-    shape: Optional[Tuple[int, ...]] = None,
-    uniform: Optional[bool] = None,
-    ndim: Optional[int] = None,
-    size: Optional[int] = None,
-    dtype: Optional[Union[type, np.dtype]] = None,  # type: ignore[type-arg]
-    kind: Optional[str] = None,
+    A: ArrayLike | spmatrix,
+    shape: tuple[int, ...] | None = None,
+    uniform: bool | None = None,
+    ndim: int | None = None,
+    size: int | None = None,
+    dtype: type | np.dtype | None = None,  # type: ignore[type-arg]
+    kind: str | None = None,
 ) -> None:
     """
     Assert whether the given array or sparse matrix has the given properties.
@@ -96,14 +95,14 @@ def assert_array(
 
 @d.dedent
 def ensure_ndarray_or_sparse(
-    A: Union[ArrayLike, spmatrix],
-    shape: Optional[Tuple[int, ...]] = None,
-    uniform: Optional[bool] = None,
-    ndim: Optional[int] = None,
-    size: Optional[int] = None,
-    dtype: Optional[Union[type, np.dtype]] = None,  # type: ignore[type-arg]
-    kind: Optional[str] = None,
-) -> Union[ArrayLike, spmatrix]:
+    A: ArrayLike | spmatrix,
+    shape: tuple[int, ...] | None = None,
+    uniform: bool | None = None,
+    ndim: int | None = None,
+    size: int | None = None,
+    dtype: type | np.dtype | None = None,  # type: ignore[type-arg]
+    kind: str | None = None,
+) -> ArrayLike | spmatrix:
     """
     Ensure ``A`` is an array or a sparse matrix and assert that the given parameters match.
 
@@ -141,6 +140,6 @@ def assert_petsc_real_scalar_type() -> None:
             )
     except Exception as e:
         logging.error(
-            f"Unable to determine PETSc's scalar type. Reason: `{e}`. Assuming true, "  # noqa: G004
+            f"Unable to determine PETSc's scalar type. Reason: `{e}`. Assuming true, "
             f"but please ensure that PETSc was compiled using `--with-scalar-type=real`.",
         )

@@ -26,7 +26,7 @@
 # https://www.math.uu.nl/publications/preprints/1180.pdf
 # --------------------------------------------------------------------------------------------------------------------
 
-from typing import List, Tuple, Union, Literal
+from typing import Literal
 
 import numpy as np
 
@@ -40,7 +40,7 @@ expensive_asserts = False
 @d.dedent
 def sort_real_schur(
     Q: ArrayLike, R: ArrayLike, z: Literal["LM", "LR"], b: float, inplace: bool = False
-) -> Tuple[ArrayLike, ArrayLike, List[float]]:
+) -> tuple[ArrayLike, ArrayLike, list[float]]:
     r"""
     Partially or completely sort the real Schur form `R` and  Schur vectors `Q` of a square matrix `A`.
 
@@ -82,7 +82,7 @@ def sort_real_schur(
         - R : quasi-triangular real `(n, n)` Schur matrix `R` such that :math:`AQ = QR`
           with the diagonal blocks ordered with respect to the target `z`.
         - ap : A list `ap` warns for inaccuracy of the solution, if an entry of `ap` exceeds one.
-    """  # noqa: D401
+    """
     eps = np.finfo(R.dtype).eps
     if not np.all(np.abs(np.tril(R, -2)) <= 100 * eps):
         raise ValueError("R is not block-triangular.")
@@ -192,9 +192,7 @@ def sort_real_schur(
 # -------------------------------------------------------------------------
 
 
-def normalize(
-    U: ArrayLike, S: ArrayLike, v: Union[slice, List[int]], inplace: bool = False
-) -> Tuple[ArrayLike, ArrayLike]:
+def normalize(U: ArrayLike, S: ArrayLike, v: slice | list[int], inplace: bool = False) -> tuple[ArrayLike, ArrayLike]:
     """
     Apply a Givens rotation such that the two-by-two diagonal block of `S` situated at diagonal positions \
     ``v[0]``, ``v[1]`` is in standardized form.
@@ -285,7 +283,7 @@ def rot(X: ArrayLike) -> ArrayLike:
 
 
 @d.dedent
-def swaplist(p: Union[ArrayLike, List[float]], s: List[int], z: Literal["LM", "LR"], b: float) -> List[int]:
+def swaplist(p: ArrayLike | list[float], s: list[int], z: Literal["LM", "LR"], b: float) -> list[int]:
     """
     Produce a list `v` of swaps of neighboring blocks needed to order the eigenvalues assembled in the vector `p` \
     from closest to `z` to farthest away from `z`, taking into account the parameter `b`.
@@ -318,7 +316,7 @@ def swaplist(p: Union[ArrayLike, List[float]], s: List[int], z: Literal["LM", "L
     n = len(p)
     p = list(p)
     k = 0
-    v: List[int] = []
+    v: list[int] = []
     srtd = 0  # Number of sorted eigenvalues.
     q = list(np.diff(s))  # Compute block sizes.
     q_orig = list(q)  # debug
@@ -367,7 +365,7 @@ def swaplist(p: Union[ArrayLike, List[float]], s: List[int], z: Literal["LM", "L
 
 
 @d.dedent
-def select(p: ArrayLike, z: Literal["LM", "LR"]) -> Tuple[float, int]:
+def select(p: ArrayLike, z: Literal["LM", "LR"]) -> tuple[float, int]:
     """
     Determine which block is next in the ordering (needed in :func:`normalize`).
 
@@ -404,7 +402,7 @@ def select(p: ArrayLike, z: Literal["LM", "LR"]) -> Tuple[float, int]:
 # -------------------------------------------------------------------------
 
 
-def swap(U: ArrayLike, S: ArrayLike, v: List[int], w: List[int], inplace: bool = False) -> Tuple[ArrayLike, ArrayLike]:
+def swap(U: ArrayLike, S: ArrayLike, v: list[int], w: list[int], inplace: bool = False) -> tuple[ArrayLike, ArrayLike]:
     """
     Swap the two blocks on the diagonal of `S` at positions symbolized by the entries of `v` and `w`.
 
@@ -501,7 +499,7 @@ def swap(U: ArrayLike, S: ArrayLike, v: List[int], w: List[int], inplace: bool =
 # -------------------------------------------------------------------------
 
 
-def lu_complpiv(A: ArrayLike, inplace: bool = False) -> Tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
+def lu_complpiv(A: ArrayLike, inplace: bool = False) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
     r"""
     Compute the LU-decomposition of a matrix `A` with complete pivoting.
 
