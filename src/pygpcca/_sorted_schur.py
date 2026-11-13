@@ -106,7 +106,7 @@ def _check_conj_split(eigenvalues: ArrayLike) -> bool:
     """
     last_eigenvalue, second_last_eigenvalue = eigenvalues[-1], eigenvalues[-2]
     splits_block = False
-    if last_eigenvalue.imag > EPS:
+    if abs(last_eigenvalue.imag) > EPS:
         splits_block = not np.isclose(last_eigenvalue, np.conj(second_last_eigenvalue))
 
     return splits_block
