@@ -1,6 +1,8 @@
-from pygpcca.utils import stationary_distribution  # type: ignore[attr-defined]
-from pygpcca._gpcca import GPCCA, gpcca_coarsegrain
+from importlib.metadata import version
 
-__author__ = __maintainer__ = "Bernhard Reuter"
-__version__ = "1.0.4"
-__email__ = "bernhard-reuter@gmx.de"
+from pygpcca._gpcca import GPCCA, gpcca_coarsegrain
+from pygpcca.utils import stationary_distribution  # type: ignore[attr-defined]
+
+__all__ = ["GPCCA", "gpcca_coarsegrain", "stationary_distribution"]
+
+__version__ = version("pygpcca")
