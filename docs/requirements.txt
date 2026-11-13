@@ -1,7 +1,0 @@
--r ../requirements.txt
-myst-nb
-sphinx>=8
-sphinx-copybutton
-sphinx_autodoc_typehints
-sphinx_rtd_theme
-sphinxcontrib-spelling
