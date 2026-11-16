@@ -4,7 +4,10 @@ requires = [ "hatch-vcs", "hatchling" ]
 
 [project]
 name = "pygpcca"
-description = "Generalized Perron Cluster Cluster Analysis program to coarse-grain reversible and non-reversible Markov state models."
+description = """\
+  Generalized Perron Cluster Cluster Analysis program to coarse-grain reversible and non-reversible Markov state \
+  models.\
+  """
 readme = "README.md"
 keywords = [
   "cellular dynamics",
@@ -48,6 +51,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
   "Topic :: Scientific/Engineering :: Mathematics",
   "Typing :: Typed",
 ]
@@ -198,11 +202,11 @@ strict = true
 testpaths = [ "tests" ]
 
 [tool.coverage]
+run.source = [ "pygpcca" ]
 run.omit = [
   "**/test_*.py",
 ]
 run.patch = [ "subprocess" ]
-run.source = [ "pygpcca" ]
 
 [tool.cruft]
 skip = [
