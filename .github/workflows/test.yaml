@@ -51,8 +51,8 @@ jobs:
   test:
     needs: get-environments
     permissions:
-       id-token: write  # for codecov OIDC
-       contents: read
+      id-token: write # for codecov OIDC
+      contents: read
 
     strategy:
       fail-fast: false
@@ -62,11 +62,16 @@ jobs:
         include:
           # PyPI numpy/scipy wheels for macOS 14+ link Apple Accelerate, unlike conda-forge's in the krylov job.
           - os: macos-latest
-            env: {name: hatch-test.py3.12-stable, label: "hatch-test.py3.12-stable (macOS, Accelerate)", python: "3.12"}
+            env:
+              {
+                name: hatch-test.py3.12-stable,
+                label: "hatch-test.py3.12-stable (macOS, Accelerate)",
+                python: "3.12",
+              }
 
     name: ${{ matrix.env.label }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ contains(matrix.env.name, 'pre') }}  # make "all-green" pass even if pre-release job fails
+    continue-on-error: ${{ contains(matrix.env.name, 'pre') }} # make "all-green" pass even if pre-release job fails
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -104,7 +109,7 @@ jobs:
   # conda-forge. No lockfile, so new petsc4py/slepc4py releases are tested as they appear.
   test-krylov:
     permissions:
-      id-token: write  # for codecov OIDC
+      id-token: write # for codecov OIDC
       contents: read
     strategy:
       fail-fast: false
@@ -145,6 +150,6 @@ jobs:
       - test-krylov
     runs-on: ubuntu-latest
     steps:
-        - uses: re-actors/alls-green@b5b5b37504aa4183270bd3d855c52a67f212be35 # v1.3.0
-          with:
-            jobs: ${{ toJSON(needs) }}
+      - uses: re-actors/alls-green@b5b5b37504aa4183270bd3d855c52a67f212be35 # v1.3.0
+        with:
+          jobs: ${{ toJSON(needs) }}
